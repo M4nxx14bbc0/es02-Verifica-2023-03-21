@@ -1,4 +1,5 @@
 #!/bin/bash
+clear
 FILE="./records.txt" # Creates records.txt file if not exists
 if [ ! -f $FILE ]; then
     touch $FILE
@@ -35,7 +36,7 @@ do   # "for" loop if menu choice is not working
             read citta
             # Output data of product inserted
             echo "$cognome $many $price \"$desc\"" | tee -a records.txt > /dev/null
-            echo -e "\033[34;40;1mPremi invio per proseguire...\033[37;40;1m";;
+            echo -e "\033[34;40;1mPremi invio per proseguire...\033[37;40;1m"
         else
             echo -e "\033[37;40;1mATTENZIONE!!"
             echo "Esiste già un contatto --> ($cognome)"
@@ -104,8 +105,8 @@ do   # "for" loop if menu choice is not working
         ;;
     5)  clear
         echo -n "Inserisci il cognome"
-        read -n5 code
-        sed '/^${code}/d';;
+        read -n5 cognome
+        sed '/^${cognome}/d'
         echo -e "\033[34;40;1mPremi invio per proseguire...\033[37;40;1m";;
     6)  clear
         echo -e "Elenco completo della rubrica\n"
