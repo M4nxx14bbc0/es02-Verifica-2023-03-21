@@ -25,17 +25,17 @@ do   # "for" loop if menu choice is not working
     1)  clear
         echo -e "Inserisci il \033[36;40;1mcognome\033[37;40;1m: "
         read -i cognome
-        echo -e "Inserisci il \033[36;40;1mnome\033[37;40;1m: "
-        read nome
-        ricerca=$(grep -w -i "$cognome;$nome" records.txt) # Check if records.txt contains already a product with the code inserted
+        ricerca=$(grep -w -i "$cognome $nome" records.txt) # Check if records.txt contains already a product with the code inserted
         if [[ -z $ricerca ]]
         then 
+            echo -e "Inserisci il \033[36;40;1mnome\033[37;40;1m: "
+            read nome
             echo -e "Inserisci il \033[36;40;1mnumero\033[37;40;1m: "
             read numero
             echo -e "Inserisci la \033[36;40;1mcitta\033[37;40;1m: "
             read citta
             # Output data of product inserted
-            echo "$cognome $many $price \"$desc\"" | tee -a records.txt > /dev/null
+            echo "$cognome $nome $numero \"$citta\"" | tee -a records.txt > /dev/null
             echo -e "\033[34;40;1mPremi invio per proseguire...\033[37;40;1m"
         else
             echo -e "\033[37;40;1mATTENZIONE!!"
@@ -58,7 +58,7 @@ do   # "for" loop if menu choice is not working
         else
             echo "\033[30;42;1mTrovato!"
             read cognome nome numero citta < dummy.txt
-            echo -e "\n$cgnome $nome $numero \"$citta\""
+            echo -e "\n$cognome $nome $numero \"$citta\""
             rm dummy.txt
             echo "\033[34;40;1mPremi invio per proseguire...\033[37;40;1m"
             read -n1 -s dummy
@@ -76,17 +76,72 @@ do   # "for" loop if menu choice is not working
             echo "\033[34;40;1mPremi invio per proseguire...\033[37;40;1m"
             read -n1 -s dummy
         else
-            while IFS=, read cognome nome numero citta
+            clear
+            INFO = 0
+            COGNOME_CHECK = false
+            CHECK = false
+            echo $ricerca | tee -a dummy.txt > /dev/null
+            read cognome nome numero citta < dummy.txt
+            echo "Scegli il dato da modificare"
+            echo "1) Cognome ($cognome)"
+            echo "2) Nome ($nome)"
+            echo "3) Numero di telefono ($numero)"
+            echo "4) Città ($citta)"
+            echo "Premi qualunque tasto per salvare o chiudere"
+            echo "Per non modificare non inserire valori"
+            read MENU    # reads menu choice
+            while [[ $INFO -ge 1 && $INFO -le 4 ]] 
             do
-                if [ $cognomem == $cognome]
-                then
-                    nomem=$(echo $nome | tr -s "")
-                    numerom=$(echo $numero | tr -s "")
-                    cittam=$(echo $citta | tr -s "")
-                fi
-            done < "records.txt"
-            
+                clear
+                case $INFO in
+                    1)  
+                        echo -e "\033[33;40;1mCognome attuale --> ($cognome)\033[37;40;1m"
+                        echo -ne "\033[33;40;1mCognome nuovo -->\033[37;40;1m"
+                        read cognomem
+                        ricerca=$(grep -w -i "$cognomem" records.txt) # Check if records.txt contains already a product with the code inserted
+                        if [[ -z $ricerca ]]
+                        then
+                            cognome=$cognomem
+                        else
+                            echo -e "\033[37;40;1mATTENZIONE!!"
+                            echo "Esiste già un contatto --> ($cognome)"
+                            echo -e "\033[34;40;1mPremi invio per proseguire...\033[37;40;1m"
+                            read -n1 -s dummy
+                        fi
+                        ;;
+                    2)  
+                        echo -e "\033[33;40;1mNome attuale --> ($nome)\033[37;40;1m"
+                        echo -ne "\033[33;40;1mNome nuovo -->\033[37;40;1m"
+                        read nomem
+                        if [[ ! -z $nomem ]]
+                        then
+                            nome=$nomem
+                        fi
+                        ;;
+                    3)
+                        echo -e "\033[33;40;1mNumero attuale --> ($numero)\033[37;40;1m"
+                        echo -ne "\033[33;40;1mNumero nuovo -->\033[37;40;1m"
+                        read numerom
+                        if [[ ! -z $numerom ]]
+                        then
+                            numero=$numerom
+                        fi
+                        ;;
+                    4)
+                        echo -e "\033[33;40;1mCittà attuale --> ($citta)\033[37;40;1m"
+                        echo -ne "\033[33;40;1mCittà nuovo -->\033[37;40;1m"
+                        read cittam
+                        if [[ ! -z $cittam ]]
+                        then
+                            numero=$numerom
+                        fi
+                        ;;
+                esac
+            done
         fi
+        text="$cognome $nome $numero \"$città\""
+        sed '/^${cognome}/d/${text}' records.txt > dummy.txt
+        echo dummy.txt > records.txt
         ;;
     4)  clear
         sort records.txt > dummy.txt
